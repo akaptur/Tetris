@@ -264,11 +264,10 @@ class Tetris():
         return points[lines_dropped]
 
     def you_lose(self):
-        lose = False
-        for column in range(1,11):
-            if self.board[3][column][0] == 'obstacle':
-                lose = True
-        return lose
+        """ Returns true when any cell other than the two border cells
+            in the top visible row (the fourth) is "obstacle"
+        """
+        return sum(status == 'obstacle' for status, _, _ in self.board[3]) > 2
 
 if __name__ == '__main__':
 
