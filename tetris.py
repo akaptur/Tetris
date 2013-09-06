@@ -301,13 +301,6 @@ class Tetris():
 				lose = True	
 		return lose			
 
-
-#STEPDOWN = USEREVENT + 2 	
-#steptime = pygame.event.Event(STEPDOWN)
-#pygame.event.post(steptime)	
-#pygame.time.set_timer(STEPDOWN, 500)
-#clock = pygame.Clock.time()
-
 if __name__ == '__main__':
 
 	board = Tetris()
