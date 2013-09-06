@@ -261,11 +261,8 @@ class Tetris():
 		newline = [['obstacle','',''],['','',''],['','',''],['','',''],['','',''],['','',''],['','',''],['','',''],['','',''],['','',''],['','',''],['obstacle','','']]
 		lines_dropped = 0
 		for row in range(23): #must use range(23), not range(24), to avoid knocking out bottom row, which is just an obstacle.
-			filled = 0
-			for column in range(12):
-				if self.board[row][column][0] == 'obstacle':
-					filled += 1
-			if filled == 12:
+			filled = all(status == 'obstacle' for status, _, _ in self.board[row])
+			if filled:
 				self.board.pop(row)
 				self.board.insert(0,newline)
 				lines_dropped += 1
