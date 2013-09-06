@@ -291,15 +291,8 @@ class Tetris():
 		return lines_dropped
 
 	def score(self, lines_dropped):
-		if lines_dropped == 1:
-			score = 100
-		elif lines_dropped == 2:
-			score = 300
-		elif lines_dropped == 3:
-			score = 600
-		elif lines_dropped == 4:
-			score = 1000	
-		return score
+		points = {1 : 100, 2 : 300, 3 : 600, 4 : 1000}
+		return points[lines_dropped]
 
 	def you_lose(self):
 		lose = False
