@@ -307,7 +307,7 @@ class Tetris():
 			if self.board[3][column][0] == 'obstacle':
 				lose = True	
 		return lose			
-				
+
 
 #STEPDOWN = USEREVENT + 2 	
 #steptime = pygame.event.Event(STEPDOWN)
@@ -315,29 +315,27 @@ class Tetris():
 #pygame.time.set_timer(STEPDOWN, 500)
 #clock = pygame.Clock.time()
 
-board = Tetris()
+if __name__ == '__main__':
 
-frames = 0
+	board = Tetris()
+	frames = 0
+	points = 0
 
-points = 0
-
-while True:
-	if not board.piece_is_active() and not board.you_lose():
-		piece = board.generate_piece()
-	board.draw_board()
-	lines_dropped = board.line_drop()
-	if lines_dropped > 0:
-		points = points + board.score(lines_dropped)
-		print points
-	frames += 1	
-	if frames % 100 == 0:
-		board.piece_fall()
-		#pdb.set_trace()
-	for event in pygame.event.get():
-		board.user_input(event, piece)
-		#print event.type, event 
-		if event.type == QUIT:
-			pygame.quit()
-			sys.exit()
-		
-
+	while True:
+		if not board.piece_is_active() and not board.you_lose():
+			piece = board.generate_piece()
+		board.draw_board()
+		lines_dropped = board.line_drop()
+		if lines_dropped > 0:
+			points = points + board.score(lines_dropped)
+			print points
+		frames += 1
+		if frames % 100 == 0:
+			board.piece_fall()
+			#pdb.set_trace()
+		for event in pygame.event.get():
+			board.user_input(event, piece)
+			#print event.type, event
+			if event.type == QUIT:
+				pygame.quit()
+				sys.exit()
