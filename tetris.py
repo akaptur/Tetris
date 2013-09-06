@@ -238,43 +238,24 @@ class Tetris():
 			return False
 
 	def generate_piece(self):
-		random_seed = random.randint(1,7)
-		if random_seed == 1: #build line
-			self.board[0][6] = ['active','line','']
-			self.board[1][6] = ['active','line','vertical']
-			self.board[2][6] = ['active','line','']
-			self.board[3][6] = ['active','line','']		
-		elif random_seed == 2: #build T
-			self.board[3][5] = ['active','T','']
-			self.board[3][6] = ['active','T','pivot']
-			self.board[3][7] = ['active','T','']
-			self.board[2][6] = ['active','T','']
-		elif random_seed == 3: #build J
-			self.board[3][5] = ['active','J','']
-			self.board[3][6] = ['active','J','pivot']
-			self.board[3][7] = ['active','J','']
-			self.board[2][5] = ['active','J','']
-		elif random_seed == 4: #build L
-			self.board[3][5] = ['active','L','']
-			self.board[3][6] = ['active','L','pivot']
-			self.board[3][7] = ['active','L','']
-			self.board[2][7] = ['active','L','']
-		elif random_seed == 5: #build square
-			self.board[3][6] = ['active','box','']
-			self.board[3][7] = ['active','box','']
-			self.board[2][6] = ['active','box','']
-			self.board[2][7] = ['active','box','']
-		elif random_seed == 6: #build S
-			self.board[3][5] = ['active','S','']
-			self.board[3][6] = ['active','S','pivot']
-			self.board[2][6] = ['active','S','']
-			self.board[2][7] = ['active','S','']
-		elif random_seed == 7: #build Z
-			self.board[3][6] = ['active','Z','pivot']
-			self.board[3][7] = ['active','Z','']
-			self.board[2][5] = ['active','Z','']
-			self.board[2][6] = ['active','Z','']
-		return self.board[3][6][1] #returns piece type
+		random_piece = random.choice(['line', 'T', 'J', 'L', 'box', 'S', 'Z'])
+		coords = {
+			'line' : [(0,6), (2,6), (3,6), (1,6)],
+			'T'    : [(3,5), (3,7), (2,6), (3,6)],
+			'J'    : [(3,5), (3,7), (2,5), (3,6)],
+			'L'    : [(3,5), (3,7), (2,7), (3,6)],
+			'box'  : [(3,6), (3,7), (2,6), (2,7)],
+			'S'    : [(3,5), (2,6), (2,7), (3,6)],
+			'Z'    : [(3,6), (2,5), (2,6), (3,7)],
+		}
+
+		for x, y in coords[random_piece]:
+			self.board[x][y] = ['active', random_piece, '']
+
+		pivot_x, pivot_y = coords[random_piece][3]
+		self.board[pivot_x][pivot_y] = ['active', random_piece, 'pivot']
+
+		return random_piece
 
 	def line_drop(self):
 		newline = [['obstacle','',''],['','',''],['','',''],['','',''],['','',''],['','',''],['','',''],['','',''],['','',''],['','',''],['','',''],['obstacle','','']]
