@@ -204,16 +204,22 @@ class Tetris():
         top, bottom = pivot_row -1, pivot_row +1
         left, right = pivot_col -1, pivot_col +1
         new = [[0 for i in range(3)] for j in range(3)] #initializes 3x3 grid
-        #MAPPING
-        new[0][0] = self.board[bottom][left]
-        new[0][1] = self.board[pivot_row][left]
-        new[0][2] = self.board[top][left]
-        new[1][0] = self.board[bottom][pivot_col]
-        new[1][1] = self.board[pivot_row][pivot_col]
-        new[1][2] = self.board[top][pivot_col]
-        new[2][0] = self.board[bottom][right]
-        new[2][1] = self.board[pivot_row][right]
-        new[2][2] = self.board[top][right]
+        mapping = {
+                    (0,0) : (bottom, left),
+                    (0,1) : (pivot_row, left),
+                    (0,2) : (top, left),
+                    (1,0) : (bottom, pivot_col),
+                    (1,1) : (pivot_row, pivot_col),
+                    (1,2) : (top, pivot_col),
+                    (2,0) : (bottom, right),
+                    (2,1) : (pivot_row, right),
+                    (2,2) : (top, right),
+                  }
+
+        for new_x, new_y in mapping:
+            old_x, old_y = mapping[(new_x, new_y)]
+            new[new_x][new_y] = self.board[old_x][old_y]
+
         #Assign to self.board
         obstacle_hit = False
         for new_row in range(3):
