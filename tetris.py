@@ -32,6 +32,8 @@ class Tetris():
                 [['obstacle','',''],['','',''],['','',''],['','',''],['','',''],['','',''],['','',''],['','',''],['','',''],['','',''],['','',''],['obstacle','','']],
                 [['obstacle','',''],['obstacle','',''],['obstacle','',''],['obstacle','',''],['obstacle','',''],['obstacle','',''],['obstacle','',''],['obstacle','',''],['obstacle','',''],['obstacle','',''],['obstacle','',''],['obstacle','','']]]
 
+        self.active_piece = None
+
     def draw_board_pygame(self):
         BLACK = (0,0,0)
         WHITE = (255,255,255)
@@ -75,15 +77,16 @@ class Tetris():
     def draw_board_terminal(self):
         out = []
         for i in range(3,23): #there are 24 rows total, 3 at the top and 1 at the bottom are NOT displayed
-            row = []
+            row = ['o']
             for j in range(1,11): #there are 12 columns total, 1 on each side is NOT displayed
                 if self.board[i][j][1] != '':
                     row.append('xxx')
                 else:
                     row.append('   ')
-            row.append('\n')
+            row.append('o\n')
             out.append("".join(row))
             out.append("".join(row))
+        out.append('o'*33)
 
         if self.you_lose():
             str_out = "you lose!"
@@ -116,7 +119,7 @@ class Tetris():
                     if self.board[row][column][0] == 'active':
                         self.board[row][column][0] = 'obstacle'
 
-    def pygame_input(self, event, piece):
+    def pygame_input(self, event):
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_RIGHT:
                 self.move_right()
@@ -125,9 +128,9 @@ class Tetris():
             elif event.key == pygame.K_DOWN:
                 self.piece_fall()
             elif event.key == pygame.K_UP:
-                self.rotate(piece)
+                self.rotate()
 
-    def terminal_input(self, char, piece):
+    def terminal_input(self, char):
         moves = {'B': self.piece_fall,
                  'C': self.move_right,
                  'D': self.move_left,
@@ -136,7 +139,7 @@ class Tetris():
             func = moves[char]
             func()
         elif char == 'A':
-            self.rotate(piece) #TODO: refactor rotate to not take piece as input
+            self.rotate() #TODO: refactor rotate to not take piece as input
 
 
     def move_left(self):
@@ -270,8 +273,7 @@ class Tetris():
 
         pivot_x, pivot_y = coords[random_piece][3]
         self.board[pivot_x][pivot_y] = ['active', random_piece, 'pivot']
-
-        return random_piece
+        self.active_piece = random_piece
 
     def line_drop(self):
         newline = [['obstacle','',''],['','',''],['','',''],['','',''],['','',''],['','',''],['','',''],['','',''],['','',''],['','',''],['','',''],['obstacle','','']]
@@ -301,7 +303,7 @@ def pygame_mode():
 
     while True:
         if not board.piece_is_active() and not board.you_lose():
-            piece = board.generate_piece()
+            board.generate_piece()
         board.draw_board_pygame()
         lines_dropped = board.line_drop()
         if lines_dropped > 0:
@@ -312,7 +314,7 @@ def pygame_mode():
             board.piece_fall()
             #pdb.set_trace()
         for event in pygame.event.get():
-            board.pygame_input(event, piece)
+            board.pygame_input(event)
             #print event.type, event
             if event.type == QUIT:
                 pygame.quit()
@@ -330,7 +332,7 @@ def terminal_mode(screen):
 
     while True:
         if not board.piece_is_active() and not board.you_lose():
-            piece = board.generate_piece()
+            board.generate_piece()
         str_board = board.draw_board_terminal()
         lines_dropped = board.line_drop()
         if lines_dropped > 0:
@@ -342,7 +344,7 @@ def terminal_mode(screen):
         if char == -1:
             pass
         else:
-            board.terminal_input(chr(char), piece)
+            board.terminal_input(chr(char))
         win.addstr(0, 0, str_board)
         win.refresh()
 
