@@ -1,5 +1,6 @@
-import pygame, sys
-from pygame.locals import *
+# import pygame, sys
+# from pygame.locals import *
+import curses
 import pdb
 import random
 
@@ -31,7 +32,7 @@ class Tetris():
                 [['obstacle','',''],['','',''],['','',''],['','',''],['','',''],['','',''],['','',''],['','',''],['','',''],['','',''],['','',''],['obstacle','','']],
                 [['obstacle','',''],['obstacle','',''],['obstacle','',''],['obstacle','',''],['obstacle','',''],['obstacle','',''],['obstacle','',''],['obstacle','',''],['obstacle','',''],['obstacle','',''],['obstacle','',''],['obstacle','','']]]
 
-    def draw_board(self):
+    def draw_board_pygame(self):
         BLACK = (0,0,0)
         WHITE = (255,255,255)
         RED = (255,0,0)
@@ -71,6 +72,23 @@ class Tetris():
             DISPLAYSURF.blit(label, (40,50))
         pygame.display.update()
 
+    def draw_board_terminal(self):
+        out = []
+        for i in range(3,23): #there are 24 rows total, 3 at the top and 1 at the bottom are NOT displayed
+            row = []
+            for j in range(1,11): #there are 12 columns total, 1 on each side is NOT displayed
+                if self.board[i][j][1] != '':
+                    row.append('xxx')
+                else:
+                    row.append('   ')
+            row.append('\n')
+            out.append("".join(row))
+            out.append("".join(row))
+
+        if self.you_lose():
+            str_out = "you lose!"
+
+        return "".join(out)
 
 
     def piece_fall(self):
@@ -98,7 +116,7 @@ class Tetris():
                     if self.board[row][column][0] == 'active':
                         self.board[row][column][0] = 'obstacle'
 
-    def user_input(self, event, piece):
+    def pygame_input(self, event, piece):
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_RIGHT:
                 self.move_right()
@@ -108,6 +126,18 @@ class Tetris():
                 self.piece_fall()
             elif event.key == pygame.K_UP:
                 self.rotate(piece)
+
+    def terminal_input(self, char, piece):
+        moves = {'B': self.piece_fall,
+                 'C': self.move_right,
+                 'D': self.move_left,
+                 }
+        if char in moves:
+            func = moves[char]
+            func()
+        elif char == 'A':
+            self.rotate(piece) #TODO: refactor rotate to not take piece as input
+
 
     def move_left(self):
         obstacle_hit = False
@@ -269,8 +299,7 @@ class Tetris():
         """
         return sum(status == 'obstacle' for status, _, _ in self.board[3]) > 2
 
-if __name__ == '__main__':
-
+def pygame_mode():
     board = Tetris()
     frames = 0
     points = 0
@@ -278,7 +307,7 @@ if __name__ == '__main__':
     while True:
         if not board.piece_is_active() and not board.you_lose():
             piece = board.generate_piece()
-        board.draw_board()
+        board.draw_board_pygame()
         lines_dropped = board.line_drop()
         if lines_dropped > 0:
             points = points + board.score(lines_dropped)
@@ -288,8 +317,41 @@ if __name__ == '__main__':
             board.piece_fall()
             #pdb.set_trace()
         for event in pygame.event.get():
-            board.user_input(event, piece)
+            board.pygame_input(event, piece)
             #print event.type, event
             if event.type == QUIT:
                 pygame.quit()
                 sys.exit()
+
+def terminal_mode(screen):
+    begin_x = 20 ; begin_y = 7
+    height = 50 ; width = 45
+    win = curses.newwin(height, width, begin_y, begin_x)
+    win.nodelay(1)
+
+    board = Tetris()
+    frames = 0
+    points = 0
+
+    while True:
+        if not board.piece_is_active() and not board.you_lose():
+            piece = board.generate_piece()
+        str_board = board.draw_board_terminal()
+        lines_dropped = board.line_drop()
+        if lines_dropped > 0:
+            points = points + board.score(lines_dropped)
+        frames += 1
+        if frames % 1000 == 0:
+            board.piece_fall()
+        char = win.getch()
+        if char == -1:
+            pass
+        else:
+            board.terminal_input(chr(char), piece)
+        win.addstr(0, 0, str_board)
+        win.refresh()
+
+
+if __name__ == '__main__':
+    # pygame_mode()
+    curses.wrapper(terminal_mode)
