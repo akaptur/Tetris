@@ -172,22 +172,18 @@ class Tetris():
                         self.board[row][column] = ['','',''] #reset cell you're moving away from
                         self.board[row][column+1] = [state,piece_type,pivot_state]
 
-    def rotate(self, piece_type):
-        if piece_type == 'line':
+    def rotate(self):
+        if self.active_piece == 'line':
             self.rotate_line()
-        elif piece_type == 'box':
+        elif self.active_piece == 'box':
             pass #rotating box does nothing
         else: #other five piece types
             pivot_row, pivot_col, pivot_state = self.find_pivot() #don't need pivot_state here, but find_pivot returns it
             self.rotate_grid(pivot_row, pivot_col)
 
     def rotate_line(self):
-        print '\n'*3
         pivot_row, pivot_col, pivot_state = self.find_pivot()
-        for row in range(pivot_row-2,pivot_row+3):
-            for column in range(pivot_col-2,pivot_col+2):
-                print self.board[row][column],
-            print '\n'
+
         obstacle_hit = False
         if pivot_state == 'vertical':
             for cell in [self.board[pivot_row][pivot_col+1], self.board[pivot_row][pivot_col-1], self.board[pivot_row][pivot_col-2]]:
@@ -205,7 +201,6 @@ class Tetris():
             for cell in [self.board[pivot_row-1][pivot_col], self.board[pivot_row+1][pivot_col], self.board[pivot_row-2][pivot_col]]:
                 if cell[0] == 'obstacle':
                     obstacle_hit = True
-                    print obstacle_hit, cell
             if not obstacle_hit:
                 self.board[pivot_row+1][pivot_col] = self.board[pivot_row][pivot_col-1]
                 self.board[pivot_row][pivot_col-1] = ['','','']
