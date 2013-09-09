@@ -7,12 +7,12 @@ import random
 class Tetris():
 
     def __init__(self):
-        def make_row():
-            return [['obstacle', '', '']] + [['', '', ''] for i in range(10)] + [['obstacle', '', '']]
-        self.board = [make_row() for i in range(23)]
+        self.board = [self.make_row() for i in range(23)]
         self.board.append([['obstacle', '', ''] for i in range(12)])
-
         self.active_piece = None
+
+    def make_row(self):
+        return [['obstacle', '', '']] + [['', '', ''] for i in range(10)] + [['obstacle', '', '']]
 
     def draw_board_pygame(self):
         BLACK = (0,0,0)
@@ -262,7 +262,7 @@ class Tetris():
         self.active_piece = random_piece
 
     def line_drop(self):
-        newline = [['obstacle','',''],['','',''],['','',''],['','',''],['','',''],['','',''],['','',''],['','',''],['','',''],['','',''],['','',''],['obstacle','','']]
+        newline = self.make_line()
         lines_dropped = 0
         for row in range(23): #must use range(23), not range(24), to avoid knocking out bottom row, which is just an obstacle.
             filled = all(status == 'obstacle' for status, _, _ in self.board[row])
