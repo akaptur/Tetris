@@ -262,7 +262,7 @@ class Tetris():
         self.active_piece = random_piece
 
     def line_drop(self):
-        newline = self.make_line()
+        newline = self.make_row()
         lines_dropped = 0
         for row in range(23): #must use range(23), not range(24), to avoid knocking out bottom row, which is just an obstacle.
             filled = all(status == 'obstacle' for status, _, _ in self.board[row])
