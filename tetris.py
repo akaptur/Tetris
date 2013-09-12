@@ -102,58 +102,50 @@ class Tetris():
     def pygame_input(self, event):
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_RIGHT:
-                self.move_right()
+                self.move('right')
             elif event.key == pygame.K_LEFT:
-                self.move_left()
+                self.move('left')
             elif event.key == pygame.K_DOWN:
                 self.piece_fall()
             elif event.key == pygame.K_UP:
                 self.rotate()
 
     def terminal_input(self, char):
-        moves = {'B': self.piece_fall,
-                 'C': self.move_right,
-                 'D': self.move_left,
-                 }
-        if char in moves:
-            func = moves[char]
-            func()
-        elif char == 'A':
-            self.rotate() #TODO: refactor rotate to not take piece as input
+        if char == 'A':
+            self.rotate()
+        elif char == 'B':
+            self.piece_fall()
+        elif char == 'C':
+            self.move('right')
+        elif char == 'D':
+            self.move('left')
 
 
-    def move_left(self):
+    def move(self, direction):
+        # next_cell has column delta for next cell, depending on direction of movement
+        next_cell = {
+                     'right':  1,
+                     'left' : -1
+                    }
+        col_delta = next_cell[direction]
+        column_order = {
+                        'right': range(11,0,-1),
+                        'left' : range(1, 11)
+                        }
+
         obstacle_hit = False
         for row in range(22,-1,-1): #loop backwards from bottom to top - easier to check for obstacles
-            for column in range(1,11):
+            for column in column_order[direction]:
                 state, piece_type, pivot_state = self.board[row][column] #unpack list into elements
-                if state == 'active':
-                    if self.board[row][column-1][0] == 'obstacle': #checks state of cell to left
-                        obstacle_hit = True
-        if not obstacle_hit: #obstacle not encountered
+                if state == 'active' and self.board[row][column+col_delta][0] == 'obstacle':
+                    obstacle_hit = True
+        if not obstacle_hit:
             for row in range(22,-1,-1):
-                for column in range(1,11):
+                for column in column_order[direction]:
                     state, piece_type, pivot_state = self.board[row][column] #unpack list into elements
                     if state == 'active':
                         self.board[row][column] = [None, None, None]
-                        self.board[row][column-1] = [state,piece_type,pivot_state]
-                        #assigns cell on left to values of original cell
-
-    def move_right(self):
-        obstacle_hit = False
-        for row in range(22,-1,-1):
-            for column in range(11,0,-1): #loop from right to left
-                state, piece_type, pivot_state = self.board[row][column] #unpack list into elements
-                if state == 'active':
-                    if self.board[row][column+1][0] == 'obstacle': #check state of cell to right
-                        obstacle_hit = True
-        if not obstacle_hit: #obstacle not encountered
-            for row in range(22,-1,-1):
-                for column in range(11,0,-1):
-                    state, piece_type, pivot_state = self.board[row][column] #unpack list into elements
-                    if state == 'active':
-                        self.board[row][column] = [None, None, None] #reset cell you're moving away from
-                        self.board[row][column+1] = [state,piece_type,pivot_state]
+                        self.board[row][column+col_delta] = [state,piece_type,pivot_state]
 
     def rotate(self):
         if self.active_piece == 'line':
