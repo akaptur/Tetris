@@ -308,8 +308,8 @@ def terminal_mode(screen):
             board.generate_piece()
         str_board = board.draw_board_terminal()
         lines_dropped = board.line_drop()
-        if lines_dropped > 0:
-            points = points + board.score(lines_dropped)
+        if lines_dropped:
+            points += board.score(lines_dropped)
         frames += 1
         if frames % 1000 == 0:
             board.piece_fall()
