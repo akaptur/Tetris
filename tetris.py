@@ -227,12 +227,7 @@ class Tetris():
 
 
     def piece_is_active(self):  #returns True if any active cells on the board
-        for row in range(23):
-            for column in range(12):
-                if self.board[row][column][0] == 'active':
-                    return True
-        else:
-            return False
+        return any('active' in cell for row in self.board for cell in row)
 
     def generate_piece(self):
         random_piece = random.choice(['line', 'T', 'J', 'L', 'box', 'S', 'Z'])
