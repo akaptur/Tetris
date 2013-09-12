@@ -8,11 +8,11 @@ class Tetris():
 
     def __init__(self):
         self.board = [self.make_row() for i in range(23)]
-        self.board.append([['obstacle', '', ''] for i in range(12)])
+        self.board.append([['obstacle', None, None] for i in range(12)])
         self.active_piece = None
 
     def make_row(self):
-        return [['obstacle', '', '']] + [['', '', ''] for i in range(10)] + [['obstacle', '', '']]
+        return [['obstacle', None, None]] + [[None, None, None] for i in range(10)] + [['obstacle', None, None]]
 
     def draw_board_pygame(self):
         BLACK = (0,0,0)
@@ -29,7 +29,7 @@ class Tetris():
             for j in range(1,11): #there are 12 columns total, 1 on each side is NOT displayed
                 y, x = i*20 - 60, j*20 - 20 #this maps to the coordinates being displayed, excluding borders
                 piece_type = self.board[i][j][1]
-                if piece_type == '':
+                if piece_type is None:
                     pygame.draw.rect(DISPLAYSURF,BLACK,(x,y,20,20))
                 elif piece_type == 'line':
                     pygame.draw.rect(DISPLAYSURF,GREEN,(x,y,20,20))
@@ -59,7 +59,7 @@ class Tetris():
         for i in range(3,23): #there are 24 rows total, 3 at the top and 1 at the bottom are NOT displayed
             row = ['o']
             for j in range(1,11): #there are 12 columns total, 1 on each side is NOT displayed
-                if self.board[i][j][1] != '':
+                if self.board[i][j][1] is not None:
                     row.append('xxx')
                 else:
                     row.append('   ')
@@ -90,7 +90,7 @@ class Tetris():
                     if self.board[row][column][0] == 'active':
                         #print "found piece in piece_fall", row, column
                         color, pivot_state = self.board[row][column][1], self.board[row][column][2]
-                        self.board[row][column] = ['','','']
+                        self.board[row][column] = [None, None, None]
                         self.board[row+1][column] = ['active',color,pivot_state]
 
         elif obstacle_hit: #if obstacle encountered, active piece becomes obstacle
@@ -135,7 +135,7 @@ class Tetris():
                 for column in range(1,11):
                     state, piece_type, pivot_state = self.board[row][column] #unpack list into elements
                     if state == 'active':
-                        self.board[row][column] = ['','','']
+                        self.board[row][column] = [None, None, None]
                         self.board[row][column-1] = [state,piece_type,pivot_state]
                         #assigns cell on left to values of original cell
 
@@ -152,7 +152,7 @@ class Tetris():
                 for column in range(11,0,-1):
                     state, piece_type, pivot_state = self.board[row][column] #unpack list into elements
                     if state == 'active':
-                        self.board[row][column] = ['','',''] #reset cell you're moving away from
+                        self.board[row][column] = [None, None, None] #reset cell you're moving away from
                         self.board[row][column+1] = [state,piece_type,pivot_state]
 
     def rotate(self):
@@ -174,11 +174,11 @@ class Tetris():
                     obstacle_hit = True
             if not obstacle_hit:
                 self.board[pivot_row][pivot_col+1] = self.board[pivot_row-1][pivot_col]
-                self.board[pivot_row-1][pivot_col] = ['','','']
+                self.board[pivot_row-1][pivot_col] = [None, None, None]
                 self.board[pivot_row][pivot_col-1] = self.board[pivot_row+1][pivot_col]
-                self.board[pivot_row+1][pivot_col] = ['','','']
+                self.board[pivot_row+1][pivot_col] = [None, None, None]
                 self.board[pivot_row][pivot_col-2] = self.board[pivot_row+2][pivot_col]
-                self.board[pivot_row+2][pivot_col] = ['','','']
+                self.board[pivot_row+2][pivot_col] = [None, None, None]
                 self.board[pivot_row][pivot_col][2] = 'horizontal' #switch pivot state
         else: #pivot state is horizontal
             for cell in [self.board[pivot_row-1][pivot_col], self.board[pivot_row+1][pivot_col], self.board[pivot_row-2][pivot_col]]:
@@ -186,18 +186,18 @@ class Tetris():
                     obstacle_hit = True
             if not obstacle_hit:
                 self.board[pivot_row+1][pivot_col] = self.board[pivot_row][pivot_col-1]
-                self.board[pivot_row][pivot_col-1] = ['','','']
+                self.board[pivot_row][pivot_col-1] = [None, None, None]
                 self.board[pivot_row-1][pivot_col] = self.board[pivot_row][pivot_col+1]
-                self.board[pivot_row][pivot_col+1] = ['','','']
+                self.board[pivot_row][pivot_col+1] = [None, None, None]
                 self.board[pivot_row+2][pivot_col] = self.board[pivot_row][pivot_col-2]
-                self.board[pivot_row][pivot_col-2] = ['','','']
+                self.board[pivot_row][pivot_col-2] = [None, None, None]
                 self.board[pivot_row][pivot_col][2] = 'vertical' #switch pivot state
 
     def find_pivot(self):
         for row in range(23):
             for column in range(12):
                 state, piece_type, pivot_state = self.board[row][column] #unpack list into elements
-                if state == 'active' and pivot_state in ['pivot', 'vertical', 'horizontal']:
+                if state == 'active' and pivot_state is not None:
                     return row, column, pivot_state
 
     def rotate_grid(self, pivot_row, pivot_col):
@@ -255,7 +255,7 @@ class Tetris():
         }
 
         for x, y in coords[random_piece]:
-            self.board[x][y] = ['active', random_piece, '']
+            self.board[x][y] = ['active', random_piece, None]
 
         pivot_x, pivot_y = coords[random_piece][3]
         self.board[pivot_x][pivot_y] = ['active', random_piece, 'pivot']
