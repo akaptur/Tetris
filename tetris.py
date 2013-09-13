@@ -185,19 +185,19 @@ class Tetris():
             old_x, old_y = mapping[(new_x, new_y)]
             new[new_x][new_y] = self.board[old_x][old_y]
 
-        #Assign to self.board
+        # check if rotation avoids obstacles
         obstacle_hit = False
         for new_row in range(3):
             for new_column in range(3):
                 if new[new_row][new_column][0] == 'active' and self.board[new_row+top][new_column+left][0] == 'obstacle':
                     obstacle_hit = True
+
+        #Assign to self.board
         if not obstacle_hit:
             for new_row in range(3):
                 for new_column in range(3): #place new onto self.board
                     if new[new_row][new_column][0] != 'obstacle':
                         self.board[top+new_row][left+new_column] = new[new_row][new_column]
-
-
 
     def piece_is_active(self):  #returns True if any active cells on the board
         return any('active' in cell for row in self.board for cell in row)
