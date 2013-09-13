@@ -59,7 +59,7 @@ class Tetris():
         out.append('o'*33)
 
         if self.you_lose():
-            str_out = "you lose!"
+            return "you lose!"
 
         return "".join(out)
 
