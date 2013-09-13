@@ -102,6 +102,7 @@ class Tetris():
                 state, piece_type, pivot_state = self.board[row][column] #unpack list into elements
                 if state == 'active' and self.board[row+r_delta][column+c_delta][0] == 'obstacle':
                     obstacle_hit = True
+
         if not obstacle_hit:
             for row in range(22,-1,-1):
                 for column in column_order[direction]:
@@ -109,6 +110,7 @@ class Tetris():
                     if state == 'active':
                         self.board[row][column] = [None, None, None]
                         self.board[row+r_delta][column+c_delta] = [state, piece_type, pivot_state]
+
         if obstacle_hit and direction == 'down':
             for row in range(22,-1,-1):
                 for column in range(12):
@@ -120,9 +122,9 @@ class Tetris():
         if self.active_piece == 'line':
             self.rotate_line()
         elif self.active_piece == 'box':
-            pass #rotating box does nothing
-        else: #other five piece types
-            pivot_row, pivot_col, pivot_state = self.find_pivot() #don't need pivot_state here, but find_pivot returns it
+            pass
+        else:
+            pivot_row, pivot_col, _ = self.find_pivot()
             self.rotate_grid(pivot_row, pivot_col)
 
     def rotate_line(self):
