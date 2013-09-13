@@ -3,6 +3,7 @@
 import curses
 import pdb
 import random
+import time
 
 class Tetris():
 
@@ -80,6 +81,8 @@ class Tetris():
             self.move('right')
         elif char == 'D':
             self.move('left')
+        elif char == 'p':
+            time.sleep(60)
 
     def move(self, direction):
         # next_cell has (row, col) delta for next cell, depending on direction of movement
