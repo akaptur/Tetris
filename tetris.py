@@ -132,33 +132,30 @@ class Tetris():
 
     def rotate_line(self):
         pivot_row, pivot_col, pivot_state = self.find_pivot()
+        horizontal_line = [(pivot_row, pivot_col + delta) for delta in range(-2,2)] # TODO: ?
+        vertical_line = [(pivot_row + delta, pivot_col) for delta in range(-1,3)]
+
+        if pivot_state == 'vertical':
+            new_status = 'horizontal'
+            next_line  = horizontal_line
+            old_line   = vertical_line
+        else:
+            new_status = 'vertical'
+            next_line  = vertical_line
+            old_line   = horizontal_line
 
         obstacle_hit = False
-        if pivot_state == 'vertical':
-            for cell in [self.board[pivot_row][pivot_col+1], self.board[pivot_row][pivot_col-1], self.board[pivot_row][pivot_col-2]]:
-                if cell[0] == 'obstacle':
-                    obstacle_hit = True
-            if not obstacle_hit:
-                self.board[pivot_row][pivot_col+1] = self.board[pivot_row-1][pivot_col]
-                self.board[pivot_row-1][pivot_col] = [None, None, None]
-                self.board[pivot_row][pivot_col-1] = self.board[pivot_row+1][pivot_col]
-                self.board[pivot_row+1][pivot_col] = [None, None, None]
-                self.board[pivot_row][pivot_col-2] = self.board[pivot_row+2][pivot_col]
-                self.board[pivot_row+2][pivot_col] = [None, None, None]
-                self.board[pivot_row][pivot_col][2] = 'horizontal' #switch pivot state
+        for cell in [self.board[row][col] for row, col in next_line]:
+            if cell[0] == 'obstacle':
+                obstacle_hit = True
 
-        else: #pivot state is horizontal
-            for cell in [self.board[pivot_row-1][pivot_col], self.board[pivot_row+1][pivot_col], self.board[pivot_row-2][pivot_col]]:
-                if cell[0] == 'obstacle':
-                    obstacle_hit = True
-            if not obstacle_hit:
-                self.board[pivot_row+1][pivot_col] = self.board[pivot_row][pivot_col-1]
-                self.board[pivot_row][pivot_col-1] = [None, None, None]
-                self.board[pivot_row-1][pivot_col] = self.board[pivot_row][pivot_col+1]
-                self.board[pivot_row][pivot_col+1] = [None, None, None]
-                self.board[pivot_row+2][pivot_col] = self.board[pivot_row][pivot_col-2]
-                self.board[pivot_row][pivot_col-2] = [None, None, None]
-                self.board[pivot_row][pivot_col][2] = 'vertical' #switch pivot state
+        if not obstacle_hit:
+            for row, col in old_line:
+                self.board[row][col] = [None, None, None]
+            for row, col in next_line:
+                self.board[row][col] = ['active', 'line', None]
+
+        self.board[pivot_row][pivot_col][2] = new_status
 
     def find_pivot(self):
         for row in range(23):
