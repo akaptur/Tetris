@@ -14,42 +14,32 @@ class Tetris():
     def make_row(self):
         return [['obstacle', None, None]] + [[None, None, None] for i in range(10)] + [['obstacle', None, None]]
 
+    def __repr__(self):
+        return self.draw_board_terminal()
+
     def draw_board_pygame(self):
-        BLACK = (0,0,0)
-        WHITE = (255,255,255)
-        RED = (255,0,0)
-        GREEN = (0,255,0)
-        BLUE = (0,0, 255)
-        PURPLE = (150,0,150)
-        TURQUOISE = (0,150,150)
-        YELLOW = (255,255,0)
-        GREY = (125,125,125)
+        color_map = {
+                    None : (0,0,0),
+                    'J' : (255,255,255),
+                    'L' : (255,0,0),
+                    'line' : (0,255,0),
+                    'T' : (0,0, 255),
+                    'S' : (150,0,150),
+                    'Z' : (0,150,150),
+                    'box' : (255,255,0),
+                    }
+
         DISPLAYSURF = pygame.display.set_mode((200,400),0,32)
         for i in range(3,23): #there are 24 rows total, 3 at the top and 1 at the bottom are NOT displayed
             for j in range(1,11): #there are 12 columns total, 1 on each side is NOT displayed
                 y, x = i*20 - 60, j*20 - 20 #this maps to the coordinates being displayed, excluding borders
                 piece_type = self.board[i][j][1]
-                if piece_type is None:
-                    pygame.draw.rect(DISPLAYSURF,BLACK,(x,y,20,20))
-                elif piece_type == 'line':
-                    pygame.draw.rect(DISPLAYSURF,GREEN,(x,y,20,20))
-                elif piece_type == 'T':
-                    pygame.draw.rect(DISPLAYSURF,BLUE,(x,y,20,20))
-                elif piece_type == 'J':
-                    pygame.draw.rect(DISPLAYSURF,WHITE,(x,y,20,20))
-                elif piece_type == 'L':
-                    pygame.draw.rect(DISPLAYSURF,RED,(x,y,20,20))
-                elif piece_type == 'S':
-                    pygame.draw.rect(DISPLAYSURF,PURPLE,(x,y,20,20))
-                elif piece_type == 'Z':
-                    pygame.draw.rect(DISPLAYSURF,TURQUOISE,(x,y,20,20))
-                elif piece_type == 'box':
-                    pygame.draw.rect(DISPLAYSURF,YELLOW,(x,y,20,20))
+                pygame.draw.rect(DISPLAYSURF, color_map[piece_type], (x,y,20,20))
         if self.you_lose():
             #print 'You lose!'
             pygame.font.init()
             myfont = pygame.font.SysFont('sawasdee', 30, bold=1)
-            pygame.draw.rect(DISPLAYSURF, GREY, (30,45,140,50))
+            pygame.draw.rect(DISPLAYSURF, (125,125,125), (30,45,140,50))
             label = myfont.render('You lose!', 1, WHITE)
             DISPLAYSURF.blit(label, (40,50))
         pygame.display.update()
