@@ -63,32 +63,6 @@ class Tetris():
 
         return "".join(out)
 
-
-    def piece_fall(self):
-        obstacle_hit = False
-        for row in range(22,-1,-1):
-            for column in range(12):
-                #print 'row: %d column: %d' %(row,column)
-                if self.board[row][column][0] == 'active':
-                    if self.board[row+1][column][0] == 'obstacle':
-                        obstacle_hit = True
-                        #print 'obstacle found at %d %d' %(row, column)
-
-        if not obstacle_hit: #keep falling as long as obstacle not hit
-            for row in range(22,-1,-1):
-                for column in range(12):
-                    if self.board[row][column][0] == 'active':
-                        #print "found piece in piece_fall", row, column
-                        color, pivot_state = self.board[row][column][1], self.board[row][column][2]
-                        self.board[row][column] = [None, None, None]
-                        self.board[row+1][column] = ['active',color,pivot_state]
-
-        elif obstacle_hit: #if obstacle encountered, active piece becomes obstacle
-            for row in range(22,-1,-1):
-                for column in range(12):
-                    if self.board[row][column][0] == 'active':
-                        self.board[row][column][0] = 'obstacle'
-
     def pygame_input(self, event):
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_RIGHT:
@@ -96,7 +70,7 @@ class Tetris():
             elif event.key == pygame.K_LEFT:
                 self.move('left')
             elif event.key == pygame.K_DOWN:
-                self.piece_fall()
+                self.move('down')
             elif event.key == pygame.K_UP:
                 self.rotate()
 
@@ -104,30 +78,32 @@ class Tetris():
         if char == 'A':
             self.rotate()
         elif char == 'B':
-            self.piece_fall()
+            self.move('down')
         elif char == 'C':
             self.move('right')
         elif char == 'D':
             self.move('left')
 
-
     def move(self, direction):
-        # next_cell has column delta for next cell, depending on direction of movement
+        # next_cell has (row, col) delta for next cell, depending on direction of movement
         next_cell = {
-                     'right':  1,
-                     'left' : -1
+                     'right': (0, 1),
+                     'left' : (0, -1),
+                     'down' : (1, 0),
                     }
-        col_delta = next_cell[direction]
+        r_delta, c_delta = next_cell[direction]
         column_order = {
                         'right': range(11,0,-1),
-                        'left' : range(1, 11)
+                        'left' : range(1, 11),
+                        'down' : range(1, 11),
                         }
 
         obstacle_hit = False
+
         for row in range(22,-1,-1): #loop backwards from bottom to top - easier to check for obstacles
             for column in column_order[direction]:
                 state, piece_type, pivot_state = self.board[row][column] #unpack list into elements
-                if state == 'active' and self.board[row][column+col_delta][0] == 'obstacle':
+                if state == 'active' and self.board[row+r_delta][column+c_delta][0] == 'obstacle':
                     obstacle_hit = True
         if not obstacle_hit:
             for row in range(22,-1,-1):
@@ -135,7 +111,13 @@ class Tetris():
                     state, piece_type, pivot_state = self.board[row][column] #unpack list into elements
                     if state == 'active':
                         self.board[row][column] = [None, None, None]
-                        self.board[row][column+col_delta] = [state,piece_type,pivot_state]
+                        self.board[row+r_delta][column+c_delta] = [state, piece_type, pivot_state]
+        if obstacle_hit and direction == 'down':
+            for row in range(22,-1,-1):
+                for column in range(12):
+                    if self.board[row][column][0] == 'active':
+                        self.board[row][column][0] = 'obstacle'
+
 
     def rotate(self):
         if self.active_piece == 'line':
@@ -162,6 +144,7 @@ class Tetris():
                 self.board[pivot_row][pivot_col-2] = self.board[pivot_row+2][pivot_col]
                 self.board[pivot_row+2][pivot_col] = [None, None, None]
                 self.board[pivot_row][pivot_col][2] = 'horizontal' #switch pivot state
+
         else: #pivot state is horizontal
             for cell in [self.board[pivot_row-1][pivot_col], self.board[pivot_row+1][pivot_col], self.board[pivot_row-2][pivot_col]]:
                 if cell[0] == 'obstacle':
@@ -275,7 +258,7 @@ def pygame_mode():
             print points
         frames += 1
         if frames % 100 == 0:
-            board.piece_fall()
+            board.move('down')
             #pdb.set_trace()
         for event in pygame.event.get():
             board.pygame_input(event)
@@ -303,7 +286,7 @@ def terminal_mode(screen):
             points += board.score(lines_dropped)
         frames += 1
         if frames % 1000 == 0:
-            board.piece_fall()
+            board.move('down')
         char = win.getch()
         if char == -1:
             pass
