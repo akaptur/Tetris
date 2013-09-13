@@ -235,7 +235,8 @@ class Tetris():
             self.board[x][y] = ['active', random_piece, None]
 
         pivot_x, pivot_y = coords[random_piece][3]
-        self.board[pivot_x][pivot_y] = ['active', random_piece, 'pivot']
+        status = 'vertical' if random_piece == 'line' else 'pivot'
+        self.board[pivot_x][pivot_y] = ['active', random_piece, status]
         self.active_piece = random_piece
 
     def line_drop(self):
