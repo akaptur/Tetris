@@ -14,9 +14,6 @@ class Tetris():
     def make_row(self):
         return [['obstacle', None, None]] + [[None, None, None] for i in range(10)] + [['obstacle', None, None]]
 
-    def __repr__(self):
-        return self.draw_board_terminal()
-
     def draw_board_pygame(self):
         color_map = {
                     None : (0,0,0),
