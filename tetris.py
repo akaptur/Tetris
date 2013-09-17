@@ -1,5 +1,3 @@
-# import pygame, sys
-# from pygame.locals import *
 import curses
 import pdb
 import random
@@ -15,33 +13,6 @@ class Tetris():
 
     def make_row(self):
         return [['obstacle', None, None]] + [[None, None, None] for i in range(10)] + [['obstacle', None, None]]
-
-    def draw_board_pygame(self):
-        color_map = {
-                    None : (0,0,0),
-                    'J' : (255,255,255),
-                    'L' : (255,0,0),
-                    'line' : (0,255,0),
-                    'T' : (0,0, 255),
-                    'S' : (150,0,150),
-                    'Z' : (0,150,150),
-                    'box' : (255,255,0),
-                    }
-
-        DISPLAYSURF = pygame.display.set_mode((200,400),0,32)
-        for i in range(3,23): #there are 24 rows total, 3 at the top and 1 at the bottom are NOT displayed
-            for j in range(1,11): #there are 12 columns total, 1 on each side is NOT displayed
-                y, x = i*20 - 60, j*20 - 20 #this maps to the coordinates being displayed, excluding borders
-                piece_type = self.board[i][j][1]
-                pygame.draw.rect(DISPLAYSURF, color_map[piece_type], (x,y,20,20))
-        if self.you_lose():
-            #print 'You lose!'
-            pygame.font.init()
-            myfont = pygame.font.SysFont('sawasdee', 30, bold=1)
-            pygame.draw.rect(DISPLAYSURF, (125,125,125), (30,45,140,50))
-            label = myfont.render('You lose!', 1, WHITE)
-            DISPLAYSURF.blit(label, (40,50))
-        pygame.display.update()
 
     def draw_board_terminal(self):
         out = []
@@ -61,17 +32,6 @@ class Tetris():
             return "you lose!"
 
         return "".join(out)
-
-    def pygame_input(self, event):
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_RIGHT:
-                self.move('right')
-            elif event.key == pygame.K_LEFT:
-                self.move('left')
-            elif event.key == pygame.K_DOWN:
-                self.move('down')
-            elif event.key == pygame.K_UP:
-                self.rotate()
 
     def terminal_input(self, char):
         if char == 'A':
@@ -245,30 +205,6 @@ class Tetris():
         """
         return sum(status == 'obstacle' for status, _, _ in self.board[3]) > 2
 
-def pygame_mode():
-    board = Tetris()
-    frames = 0
-    points = 0
-
-    while True:
-        if not board.piece_is_active() and not board.you_lose():
-            board.generate_piece()
-        board.draw_board_pygame()
-        lines_dropped = board.line_drop()
-        if lines_dropped > 0:
-            points = points + board.score(lines_dropped)
-            print points
-        frames += 1
-        if frames % 100 == 0:
-            board.move('down')
-            #pdb.set_trace()
-        for event in pygame.event.get():
-            board.pygame_input(event)
-            #print event.type, event
-            if event.type == QUIT:
-                pygame.quit()
-                sys.exit()
-
 def terminal_mode(screen):
     begin_x = 20 ; begin_y = 7
     height = 50 ; width = 45
@@ -301,5 +237,4 @@ def terminal_mode(screen):
 
 
 if __name__ == '__main__':
-    # pygame_mode()
     curses.wrapper(terminal_mode)
