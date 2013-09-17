@@ -11,6 +11,7 @@ class Tetris():
         self.board = [self.make_row() for i in range(23)]
         self.board.append([['obstacle', None, None] for i in range(12)])
         self.active_piece = None
+        self.game_paused = False
 
     def make_row(self):
         return [['obstacle', None, None]] + [[None, None, None] for i in range(10)] + [['obstacle', None, None]]
@@ -82,7 +83,9 @@ class Tetris():
         elif char == 'D':
             self.move('left')
         elif char == 'p':
-            time.sleep(60)
+            self.game_paused = True
+        elif char == 'r':
+            self.game_paused = False
 
     def move(self, direction):
         # next_cell has (row, col) delta for next cell, depending on direction of movement
@@ -277,6 +280,13 @@ def terminal_mode(screen):
     points = 0
 
     while True:
+        char = win.getch()
+        if char == -1:
+            pass
+        else:
+            board.terminal_input(chr(char))
+        if board.game_paused:
+            continue
         if not board.piece_is_active() and not board.you_lose():
             board.generate_piece()
         str_board = board.draw_board_terminal()
@@ -286,11 +296,6 @@ def terminal_mode(screen):
         frames += 1
         if frames % 1000 == 0:
             board.move('down')
-        char = win.getch()
-        if char == -1:
-            pass
-        else:
-            board.terminal_input(chr(char))
         win.addstr(0, 0, str_board)
         win.refresh()
 
