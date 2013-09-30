@@ -90,8 +90,7 @@ class Tetris():
         elif self.active_piece == 'box':
             pass
         else:
-            pivot_row, pivot_col, _ = self.find_pivot()
-            self.rotate_grid(pivot_row, pivot_col)
+            self.rotate_grid()
 
     def rotate_line(self):
         pivot_row, pivot_col, pivot_state = self.find_pivot()
@@ -127,7 +126,10 @@ class Tetris():
                 if state == 'active' and pivot_state is not None:
                     return row, column, pivot_state
 
-    def rotate_grid(self, pivot_row, pivot_col):
+    def rotate_grid(self):
+        pivot_row, pivot_col, _ = self.find_pivot()
+        grid = [row[pivot_col-1:pivot_col+1] for row in self.board[pivot_row-1 : pivot_row+1]]
+
         top, bottom = pivot_row -1, pivot_row +1
         left, right = pivot_col -1, pivot_col +1
         new = [[0 for i in range(3)] for j in range(3)] #initializes 3x3 grid
